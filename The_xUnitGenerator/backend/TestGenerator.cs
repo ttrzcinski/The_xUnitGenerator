@@ -9,12 +9,22 @@ namespace The_xUnitGenerator.backend
     
         public TestGenerator() {}
 
+        /// <summary>
+        /// Calls the logger tolog an error and return null as error result.
+        /// </summary>
+        /// <param name="line">given line to log</param>
+        /// <returns>null</returns>
         private string AsError(string line)
         {
             Console.WriteLine($"FindRepositoryURL - {line}");
             return null;
         }
 
+        /// <summary>
+        /// Finds git url to Github repository.
+        /// </summary>
+        /// <param name="name">name of repository</param>
+        /// <returns>url, if found, null toherwise</returns>
         public string FindRepositoryURL(string name)
         {
             bool flag_createAFile = false;
@@ -33,21 +43,24 @@ namespace The_xUnitGenerator.backend
             using (WebClient client = new WebClient()) // WebClient class inherits IDisposable
             {
                 string tmpURL = $"https://github.com/{lineParts[0]}/{lineParts[1]}.git";
-                // CHANGE TO LOCAL PROJECT'S TMP DIRECTORY
                 if (flag_createAFile) {
+                    // CHANGE TO LOCAL PROJECT'S TMP DIRECTORY
+
+                    // TODO CHECK, IF TMP DIRECTORY EXISTS
+
+                    // TODO CREATE DIRECTORY, 
                     string projPath = System.IO.Directory.GetCurrentDirectory();
-                    Console.WriteLine("Created file: " + projPath);
+                    Console.WriteLine($"Created file: {projPath}");
                     client.DownloadFile(tmpURL, $"{projPath}\\localfile.git");
                 }
 
                 // Or you can get the file content without saving it;
-                //Console.WriteLine("Created git: " + tmpURL);
                 htmlCode = client.DownloadString(tmpURL);
             }
             if (string.IsNullOrWhiteSpace(htmlCode)) return AsError("Obtained github webpage has no content.");
 
             string url = null;
-            // TODO OBTAIN URL TO CLONE
+            // Obtain url to clone
             if (htmlCode.Contains("https://github.com") || htmlCode.Contains(".git"))
             {
                 htmlCode = htmlCode.Substring(0, htmlCode.LastIndexOf(".git\""));
@@ -60,10 +73,15 @@ namespace The_xUnitGenerator.backend
                 Console.WriteLine("It doesn't contain a link to GitHub.");
             }
 
-            return url;
+            // Checks, If the outcome is a single valid url
+            return FastValidators.CheckURLValid(url) ? url : null;
         }
 
-        //
+        /// <summary>
+        /// Lists methods of pointed class.
+        /// </summary>
+        /// <param name="className">pointed class</param>
+        /// <returns>lsit of methods, if found, null otherwise</returns>
         public string[] ListMethods(string className)
         {
             if (string.IsNullOrWhiteSpace(className)) return null;

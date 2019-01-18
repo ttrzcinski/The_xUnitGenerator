@@ -14,7 +14,7 @@ namespace The_xUnitGenerator
             Console.WriteLine("  The_xUnitGenerator 0.0.1.");
             Console.WriteLine("-----------------------------");
             Console.WriteLine("For more information add -?");
-            
+
             // Compare with known arguments
             // TODO ADD HERE WAIT FOR USER INPUT WITH WAANTED COMMAND NAD FIXED ARUGUMENTS
             var looping = true;
@@ -38,16 +38,25 @@ namespace The_xUnitGenerator
                             Console.WriteLine("Generating for what?");
                             continue;
                         }
-                        else
+
+                        Console.WriteLine("Calling xUnit Generator..");
+                        TestGenerator testGenerator = new TestGenerator();
+                        string response = testGenerator.FindRepositoryURL(lineParts[1]);
+                        if (string.IsNullOrWhiteSpace(response))
                         {
-                            Console.WriteLine("Calling xUnit Generator..");
-                            TestGenerator testGenerator = new TestGenerator();
-                            string response = testGenerator.FindRepositoryURL(lineParts[1]);
-                            if (!string.IsNullOrWhiteSpace(response)) {
-                                response = $"git clone {response}";
-                                Console.WriteLine(response);
-                            }
+                            Console.WriteLine("Obtained git url is empty.");
+                            continue;
                         }
+                        response = $"git clone {response}";
+
+                        FastLine fastLine = new FastLine();
+                        if (!fastLine.GetIsGitRunning())
+                        {
+                            Console.WriteLine("GIT IS NOT HERE! - Please, install git.");
+                            continue;
+                        }
+                        string result = fastLine.Cmd("git status");
+                        Console.WriteLine(result);
                         break;
 
                     case "co":
