@@ -48,10 +48,49 @@ namespace The_xUnitGenerator.backend
         /// <returns>current directory's path</returns>
         public string WhereAmI() => Cmd("echo %cd%");
 
+        /// <summary>
+        /// Returns directory of current project within current solution.
+        /// </summary>
+        /// <returns>path to current project, if found, null otherwise</returns>
+        public string GetCurrentProjectsDirectory()
+        {
+            string projPath = System.IO.Directory.GetCurrentDirectory();
+            return projPath != null && projPath.Contains("\\bin") ? projPath.Substring(0, projPath.IndexOf("\\bin")) : null;
+        }
+
+        /// <summary>
+        /// Returns directory of current solution.
+        /// </summary>
+        /// <returns>current solution, if found, null otherwise</returns>
+        public string GetCurrentSolutionDirectory()
+        {
+            string projPath = GetCurrentProjectsDirectory();
+            return projPath != null ? projPath.Substring(0, projPath.LastIndexOf("\\")) : null;
+        }
+
+        /// <summary>
+        /// Checks, if current directory is empty.
+        /// </summary>
+        /// <returns>true means, it is, false otherwise</returns>
         public bool IsCurrentDirectoryEmpty()
         {
             List<string> result = ListFiles();
             return result != null && result.Count == 0;
+        }
+
+        public bool HasPointedSolutionTestProject(string directoryPath)
+        {
+            // Check given directory path parameter
+            if (string.IsNullOrWhiteSpace(directoryPath)) return false;
+            // TODO Check if directory is empty
+
+            // TODO Check if directory is a solution
+
+            // TODO Check if solution contains at least 1 project
+
+            // TODO Check if solution contains test project from every code project
+
+            return false;
         }
 
         /// <summary>

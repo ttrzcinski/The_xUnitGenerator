@@ -7,22 +7,35 @@ namespace The_xUnitGenerator
     {
         static void Main(string[] args)
         {
-            bool given2nd = false;
-
-            // Check, what user wanted
             Console.WriteLine("-----------------------------");
             Console.WriteLine("  The_xUnitGenerator 0.0.1.");
             Console.WriteLine("-----------------------------");
             Console.WriteLine("For more information add -?");
 
+            FastLine fastLine = new FastLine();
+            TestGenerator testGenerator = new TestGenerator();
+
+            bool given2nd = false;
+            // Check, what user wanted
+
+            // TODO CHECK, IF IN ARGUMENTS WAS ALREADY PROVIDED FULL COMMAND WITH PARAMS
+
+            // TODO CHECK, IF GIT IS SET
+            if (!fastLine.GetIsGitRunning())
+            {
+                Console.WriteLine("GIT IS NOT HERE! - Please, install git first.");
+                return;
+            }
+
+            // TODO CHECK, IF GITHUB RESPONDS MEANING NET CONNECTION WORKS
+
             // Compare with known arguments
-            // TODO ADD HERE WAIT FOR USER INPUT WITH WAANTED COMMAND NAD FIXED ARUGUMENTS
             var looping = true;
             // Start looping, until user stops with exit
             do
             {
-                // Obtain command from user
-                Console.WriteLine("What can be done?");
+                // Obtain command from user with params
+                Console.WriteLine($"{Environment.NewLine}What has to be done?");
                 string line = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 string[] lineParts = line.Split(" ");
@@ -40,7 +53,6 @@ namespace The_xUnitGenerator
                         }
 
                         Console.WriteLine("Calling xUnit Generator..");
-                        TestGenerator testGenerator = new TestGenerator();
                         string response = testGenerator.FindRepositoryURL(lineParts[1]);
                         if (string.IsNullOrWhiteSpace(response))
                         {
@@ -49,12 +61,6 @@ namespace The_xUnitGenerator
                         }
                         response = $"git clone {response}";
 
-                        FastLine fastLine = new FastLine();
-                        if (!fastLine.GetIsGitRunning())
-                        {
-                            Console.WriteLine("GIT IS NOT HERE! - Please, install git.");
-                            continue;
-                        }
                         string result = fastLine.Cmd("git status");
                         Console.WriteLine(result);
                         break;
@@ -65,13 +71,23 @@ namespace The_xUnitGenerator
                             Console.WriteLine("Checking out what?");
                             continue;
                         }
-                        else
+
+                        lineParts[1] = lineParts[1].Trim().ToLower();
+                        if (!FastValidators.CheckURLValid(lineParts[1]))
                         {
-                            Console.WriteLine($"Calling GitHub with {args[1]}.");
+                            Console.WriteLine("It is not a valid git repository url.");
+                            continue;
                         }
+                        Console.WriteLine($"Calling GitHub with {lineParts[1]}.");
+
+                        //
+
                         break;
 
                     case "tst":
+                        Console.WriteLine($"solution: {fastLine.GetCurrentSolutionDirectory()}");
+                        Console.WriteLine($"project: {fastLine.GetCurrentProjectsDirectory()}");
+
                         if (!given2nd)
                         {
                             Console.WriteLine("Testing what?");
@@ -93,6 +109,11 @@ namespace The_xUnitGenerator
                         {
                             Console.WriteLine("Pushing changes..");
                         }
+                        break;
+
+                    case "?":
+                        Console.WriteLine("Maybe something, like:");
+                        Console.WriteLine("gen ttrzcinski/Clint");
                         break;
 
                     case "exit":

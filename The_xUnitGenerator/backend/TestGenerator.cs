@@ -6,8 +6,8 @@ namespace The_xUnitGenerator.backend
     class TestGenerator
     {
         private string Filter { set; get; } = "*.cs";
-    
-        public TestGenerator() {}
+
+        public TestGenerator() { }
 
         /// <summary>
         /// Calls the logger tolog an error and return null as error result.
@@ -43,19 +43,37 @@ namespace The_xUnitGenerator.backend
             using (WebClient client = new WebClient()) // WebClient class inherits IDisposable
             {
                 string tmpURL = $"https://github.com/{lineParts[0]}/{lineParts[1]}.git";
-                if (flag_createAFile) {
+
+                FastLine fastLine = new FastLine();
+                string projPath = fastLine.GetCurrentProjectsDirectory();
+
+                if (projPath != null && flag_createAFile)
+                {
                     // CHANGE TO LOCAL PROJECT'S TMP DIRECTORY
+                    //string projPath = System.IO.Directory.GetCurrentDirectory();
 
                     // TODO CHECK, IF TMP DIRECTORY EXISTS
 
+
                     // TODO CREATE DIRECTORY, 
-                    string projPath = System.IO.Directory.GetCurrentDirectory();
-                    Console.WriteLine($"Created file: {projPath}");
-                    client.DownloadFile(tmpURL, $"{projPath}\\localfile.git");
+                    fastLine.Cmd($"cd %{projPath}% && mkdir tmp");
+
+                    string filePath = $"{projPath}\\localfile.git";
+                    client.DownloadFile(tmpURL, filePath);
+                    Console.WriteLine($"Created file: {filePath}");
                 }
 
                 // Or you can get the file content without saving it;
-                htmlCode = client.DownloadString(tmpURL);
+                try
+                {
+                    htmlCode = client.DownloadString(tmpURL);
+                }
+                catch (Exception exc_1)
+                {
+                    //The remote server returned an error: (404) Not Found.'
+                    // TODO CHANGE TO NULL AND PASSING EXCEPTINO EXTERNALLY
+                    return exc_1.Message;
+                }
             }
             if (string.IsNullOrWhiteSpace(htmlCode)) return AsError("Obtained github webpage has no content.");
 
@@ -65,16 +83,12 @@ namespace The_xUnitGenerator.backend
             {
                 htmlCode = htmlCode.Substring(0, htmlCode.LastIndexOf(".git\""));
                 htmlCode = htmlCode + ".git";
-                htmlCode = htmlCode.Substring(htmlCode.LastIndexOf("\"https://github.com")+1);
+                htmlCode = htmlCode.Substring(htmlCode.LastIndexOf("\"https://github.com") + 1);
                 url = htmlCode;
+                // Checks, If the outcome is a single valid url
+                return FastValidators.CheckURLValid(url) ? url : AsError("Obtained url is wrong: " + url);
             }
-            else
-            {
-                Console.WriteLine("It doesn't contain a link to GitHub.");
-            }
-
-            // Checks, If the outcome is a single valid url
-            return FastValidators.CheckURLValid(url) ? url : null;
+            return AsError("It doesn't contain a link to GitHub.");
         }
 
         /// <summary>
