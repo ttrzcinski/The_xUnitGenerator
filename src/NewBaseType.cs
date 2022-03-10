@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using The_xUnitGenerator.backend;
 
 namespace The_xUnitGenerator
 {
-    class Program
+    internal class NewBaseType
     {
-        static void Main(string[] args)
+        public static void Obsolete()
         {
             Console.WriteLine("-----------------------------");
             Console.WriteLine("  The_xUnitGenerator 0.0.1.");

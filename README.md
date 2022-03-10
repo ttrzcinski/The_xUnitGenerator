@@ -1,2 +1,5 @@
 # The_xUnitGenerator
-[.NET core 3][Visual Studio 2019] A simple console app, which generates xUnit tests based on templates from existing C# code.
+[.NET core 6] A simple console app, which generates xUnit tests from existing C# code.
+
+# Release change - Dev
+- Refactoring out the current implementation and moving to .NET 6

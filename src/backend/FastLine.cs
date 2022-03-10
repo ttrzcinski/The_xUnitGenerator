@@ -17,7 +17,7 @@ namespace The_xUnitGenerator.backend
         {
             Process cmd = new Process();
 
-            cmd.StartInfo.FileName = "cmd.exe";
+            cmd.StartInfo.FileName = "sh";
             cmd.StartInfo.RedirectStandardInput = true;
             cmd.StartInfo.RedirectStandardOutput = true;
             cmd.StartInfo.CreateNoWindow = true;
